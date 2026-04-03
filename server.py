@@ -41,10 +41,11 @@ async def register(data: RegData):
         await send_photo(
             data.user_id,
             "https://i.postimg.cc/bd26ppTS/image.jpg",
-            f"👤 {data.fullname}\n"
-            f"📧 {data.email}\n"
-            f"📱 {data.phone}\n\n"
-            f"До встречи на конференции! 🎉"
+           f"📌 <b>Ваши данные:</b>\n"
+           f"👤 {data.fullname}\n"
+           f"📧 {data.email}\n"
+           f"📱 {data.phone}\n\n"
+           f"До встречи на конференции! 🎉"
         )
 
     username_str = f"@{data.username}" if data.username else "не указан"
