@@ -25,30 +25,28 @@ class RegData(BaseModel):
     username: Optional[str] = ''
     first_name: Optional[str] = ''
 
-async def send_message(chat_id, text):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+async def send_photo(chat_id, photo_url, caption):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
     async with httpx.AsyncClient() as client:
         await client.post(url, json={
             "chat_id": chat_id,
-            "text": text,
+            "photo": photo_url,
+            "caption": caption,
             "parse_mode": "HTML"
         })
 
 @app.post("/register")
 async def register(data: RegData):
-    # Пишем пользователю только если знаем его ID
     if data.user_id:
-        await send_message(
+        await send_photo(
             data.user_id,
-            f"✅ <b>Регистрация подтверждена!</b>\n\n"
-            f"📌 <b>Ваши данные:</b>\n"
+            "https://i.postimg.cc/bd26ppTS/image.jpg",
             f"👤 {data.fullname}\n"
             f"📧 {data.email}\n"
             f"📱 {data.phone}\n\n"
             f"До встречи на конференции! 🎉"
         )
 
-    # Пишем админу
     username_str = f"@{data.username}" if data.username else "не указан"
     await send_message(
         ADMIN_ID,
