@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 import httpx
 import os
 
@@ -21,6 +22,8 @@ class RegData(BaseModel):
     email: str
     phone: str
     user_id: int
+    username: Optional[str] = ''
+    first_name: Optional[str] = ''
 
 async def send_message(chat_id, text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -33,21 +36,26 @@ async def send_message(chat_id, text):
 
 @app.post("/register")
 async def register(data: RegData):
-    await send_message( 
-        data.user_id,
-        f"✅ <b>Регистрация подтверждена!</b>\n\n"
-        f"📌 <b>Ваши данные:</b>\n"
-        f"👤 {data.fullname}\n"
-        f"📧 {data.email}\n"
-        f"📱 {data.phone}\n\n"
-        f"До встречи на конференции! 🎉"
-    )
+    # Пишем пользователю только если знаем его ID
+    if data.user_id:
+        await send_message(
+            data.user_id,
+            f"✅ <b>Регистрация подтверждена!</b>\n\n"
+            f"📌 <b>Ваши данные:</b>\n"
+            f"👤 {data.fullname}\n"
+            f"📧 {data.email}\n"
+            f"📱 {data.phone}\n\n"
+            f"До встречи на конференции! 🎉"
+        )
+
+    # Пишем админу
+    username_str = f"@{data.username}" if data.username else "не указан"
     await send_message(
         ADMIN_ID,
         f"🔔 <b>Новая регистрация!</b>\n\n"
         f"👤 {data.fullname}\n"
         f"📧 {data.email}\n"
         f"📱 {data.phone}\n"
-        f"🆔 user_id: {data.user_id}"
+        f"🆔 Telegram: {username_str} ({data.user_id})"
     )
     return {"ok": True}
