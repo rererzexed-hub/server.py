@@ -34,29 +34,21 @@ async def send_message(chat_id, text):
             "parse_mode": "HTML"
         })
 
-async def send_photo(chat_id, photo_url, caption):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
-    async with httpx.AsyncClient() as client:
-        await client.post(url, json={
-            "chat_id": chat_id,
-            "photo": photo_url,
-            "caption": caption,
-            "parse_mode": "HTML"
-        })
-
 @app.post("/register")
 async def register(data: RegData):
+    # Пишем пользователю только если знаем его ID
     if data.user_id:
-        await send_photo(
+        await send_message(
             data.user_id,
-            "https://i.postimg.cc/ppc4Lqj0/image.jpg",
-           f"📌 <b>Ваши данные:</b>\n"
-           f"👤 {data.fullname}\n"
-           f"📧 {data.email}\n"
-           f"📱 {data.phone}\n\n"
-           f"До встречи на конференции! 🎉"
+            f"✅ <b>Регистрация подтверждена!</b>\n\n"
+            f"📌 <b>Ваши данные:</b>\n"
+            f"👤 {data.fullname}\n"
+            f"📧 {data.email}\n"
+            f"📱 {data.phone}\n\n"
+            f"До встречи на конференции! 🎉"
         )
 
+    # Пишем админу
     username_str = f"@{data.username}" if data.username else "не указан"
     await send_message(
         ADMIN_ID,
