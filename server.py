@@ -25,6 +25,15 @@ class RegData(BaseModel):
     username: Optional[str] = ''
     first_name: Optional[str] = ''
 
+async def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    async with httpx.AsyncClient() as client:
+        await client.post(url, json={
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML"
+        })
+
 async def send_photo(chat_id, photo_url, caption):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
     async with httpx.AsyncClient() as client:
@@ -40,7 +49,7 @@ async def register(data: RegData):
     if data.user_id:
         await send_photo(
             data.user_id,
-            "https://postimg.cc/ppc4Lqj0/image.jpg",
+            "https://i.postimg.cc/ppc4Lqj0/image.jpg",
            f"📌 <b>Ваши данные:</b>\n"
            f"👤 {data.fullname}\n"
            f"📧 {data.email}\n"
